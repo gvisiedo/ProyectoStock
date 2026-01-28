@@ -1,0 +1,107 @@
+/* Configuración General */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f7f6;
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.container {
+    background-color: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 600px;
+}
+
+h1 {
+    color: #333;
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Formulario de entrada */
+.form-group {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 2rem;
+}
+
+input {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    outline: none;
+    flex: 1;
+}
+
+input:focus {
+    border-color: #4a90e2;
+}
+
+button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.form-group button {
+    background-color: #2ecc71;
+    color: white;
+}
+
+.form-group button:hover {
+    background-color: #27ae60;
+}
+
+/* Tabla de Stock */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+th {
+    background-color: #f8f9fa;
+    color: #666;
+    text-align: left;
+    padding: 12px;
+    border-bottom: 2px solid #eee;
+}
+
+td {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    vertical-align: middle;
+}
+
+/* Botones de acción (+, -, x) */
+td button {
+    background-color: #e0e0e0;
+    color: #333;
+    margin: 0 2px;
+}
+
+td button:hover {
+    background-color: #d0d0d0;
+}
+
+td button[style*="background:red"] {
+    color: white;
+    float: right;
+}
+
+td button[style*="background:red"]:hover {
+    background-color: #c0392b !important;
+}
+
+strong {
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
