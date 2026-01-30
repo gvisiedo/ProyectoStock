@@ -79,12 +79,15 @@ function actualizarInterfaz() {
     });
 }
 
-function cambiarCantidad(index, valor) {
+async function cambiarCantidad(index, valor) {
     inventario[index].cantidad += valor;
     if(inventario[index].cantidad < 0) inventario[index].cantidad = 0;
+    
     actualizarInterfaz();
-    guardarEnNube();
+    // Enviamos solo este cambio a la nube
+    await sincronizarProducto(inventario[index]);
 }
+
 
 function eliminar(index) {
     inventario.splice(index, 1);
@@ -123,4 +126,75 @@ function filtrarProductos() {
             fila.style.display = "none"; // Oculta la fila
         }
     });
+}
+function iniciarEscaneo() {
+    const container = document.getElementById('scanner-container');
+    container.style.display = "block";
+
+    Quagga.init({
+        inputStream: {
+            name: "Live",
+            type: "LiveStream",
+            target: document.querySelector('#scanner-container'),
+            constraints: { facingMode: "environment" } // Usa la cámara trasera
+        },
+        decoder: { readers: ["ean_reader", "code_128_reader"] }
+    }, function(err) {
+        if (err) { console.error(err); return; }
+        Quagga.start();
+    });
+
+    Quagga.onDetected(async (data) => {
+    const codigo = data.codeResult.code;
+    Quagga.stop();
+    document.getElementById('scanner-container').style.display = "none";
+
+    // Obtener el modo seleccionado (entrada o salida)
+    const modo = document.querySelector('input[name="modo"]:checked').value;
+    const productoExistente = inventario.find(p => p.nombre === codigo);
+
+    if (productoExistente) {
+        if (modo === "entrada") {
+            productoExistente.cantidad += 1;
+        } else {
+            // Evitar stock negativo
+            if (productoExistente.cantidad > 0) {
+                productoExistente.cantidad -= 1;
+            } else {
+                alert("¡Error! No hay stock suficiente para dar salida.");
+            }
+        }
+    } else {
+        if (modo === "entrada") {
+            inventario.push({ nombre: codigo, cantidad: 1 });
+        } else {
+            alert("El producto no existe. No se puede dar salida.");
+        }
+    }
+
+    actualizarInterfaz();
+    await guardarEnNube();
+});
+}
+
+// Función para enviar solo UN producto modificado
+async function sincronizarProducto(producto) {
+    await fetch(URL_API, {
+        method: 'POST',
+        mode: 'no-cors', // Importante para evitar bloqueos de seguridad simples
+        body: JSON.stringify(producto)
+    });
+}
+
+
+// Función para refrescar datos desde cualquier PC
+async function refrescarInventario() {
+    const btn = document.getElementById('btn-refrescar');
+    btn.innerText = "Cargando...";
+    
+    const respuesta = await fetch(URL_API);
+    inventario = await respuesta.json();
+    
+    actualizarInterfaz();
+    btn.innerText = "🔄 Sincronizar con Nube";
 }
